@@ -72,6 +72,7 @@ export async function generateRegularTemplate(steamid: string) {
             },
             puppeteerArgs: {
                 timeout: 10000,
+                args: ['--no-sandbox']
             }
         })
 
