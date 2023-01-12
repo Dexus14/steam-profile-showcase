@@ -35,7 +35,7 @@ export async function generateRegularTemplate(steamid: string) {
     const playerLevel = (await playerLevelData).data.response.player_level
     const levelColor = getLevelColor(playerLevel)
 
-    return await htmlToImage({
+    return htmlToImage({
         html: regularTemplate,
         content: {
             playerLevel,
@@ -50,6 +50,8 @@ export async function generateRegularTemplate(steamid: string) {
             playerAvatar,
             levelColor
         },
-
+        puppeteerArgs: {
+            timeout: 10000
+        }
     })
 }
