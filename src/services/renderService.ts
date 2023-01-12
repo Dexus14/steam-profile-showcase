@@ -22,23 +22,11 @@ export async function generateRegularTemplate(steamid: string) {
     if(imageCache.has(steamid)) {
         console.log('cache hit!')
 
-        const hit = imageCache.get(steamid)
-
-        if(hit === 'loading') {
-            console.log('cache delay')
-            await new Promise(r => setTimeout(r, 5000))
-        }
-
-        const newHit = imageCache.get(steamid)
-        if(newHit === 'loading') {
-            throw new Error('Cache is loading')
-        }
-
         return imageCache.get(steamid)
     }
 
-    imageCache.set(steamid, 'loading')
 
+    const datastart = Date.now()
     const [playerSummary, recentlyPlayedGames] = await Promise.all([
         getPlayerSummary(steamid),
         getRecentlyPlayed(steamid)
@@ -61,8 +49,12 @@ export async function generateRegularTemplate(steamid: string) {
     const playerLevel = (await playerLevelData).data.response.player_level
     const levelColor = getLevelColor(playerLevel)
 
+    const dataend = Date.now()
+    console.log(`data received in ${dataend - datastart} ms`)
     console.log('rendering image')
     try {
+        const start = Date.now()
+
         const image = htmlToImage({
             html: regularTemplate,
             content: {
@@ -83,6 +75,7 @@ export async function generateRegularTemplate(steamid: string) {
             }
         })
 
+        console.log('rendered image in', Date.now() - start, 'ms')
         imageCache.set(steamid, image)
         return image
     } catch(e) {
