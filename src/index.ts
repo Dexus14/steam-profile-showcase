@@ -30,6 +30,8 @@ app.get('/api/templates/regular', async (req, res) => {
     }
 })
 
+app.get('/health', (req, res) => res.sendStatus(200))
+
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use((req, res) => {
