@@ -19,8 +19,11 @@ app.get('/api/templates/regular', async (req, res) => {
         return res.send('No steamid provided').status(500)
     }
 
+    console.log('received request')
+
     try {
         const image = await generateRegularTemplate(steamid)
+        console.log('sending image')
         res.contentType('image/png')
             .setHeader("Content-Disposition", "inline; filename=signature.png")
             .send(image)

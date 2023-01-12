@@ -18,6 +18,7 @@ export async function generateRegularTemplate(steamid: string) {
         getPlayerSummary(steamid),
         getRecentlyPlayed(steamid)
     ])
+    console.log('received steam data')
     const playerLevelData = getLevel(steamid)
     const player = playerSummary.data.response.players[0]
 
@@ -35,6 +36,7 @@ export async function generateRegularTemplate(steamid: string) {
     const playerLevel = (await playerLevelData).data.response.player_level
     const levelColor = getLevelColor(playerLevel)
 
+    console.log('rendering image')
     return htmlToImage({
         html: regularTemplate,
         content: {
