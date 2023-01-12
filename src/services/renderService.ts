@@ -9,11 +9,20 @@ import {
 import htmlToImage from "node-html-to-image";
 import * as fs from "fs";
 import * as path from "path";
+import NodeCache from "node-cache";
 
 const regularTemplate = fs.readFileSync(path.join(__dirname, '../../src/templates/regular.hbs')).toString()
 
+const imageCache = new NodeCache({
+    stdTTL: 60,
+    checkperiod: 60
+})
 
 export async function generateRegularTemplate(steamid: string) {
+    if(imageCache.has(steamid)) {
+        console.log('cache hit!')
+        return imageCache.get(steamid)
+    }
     const [playerSummary, recentlyPlayedGames] = await Promise.all([
         getPlayerSummary(steamid),
         getRecentlyPlayed(steamid)
@@ -37,23 +46,30 @@ export async function generateRegularTemplate(steamid: string) {
     const levelColor = getLevelColor(playerLevel)
 
     console.log('rendering image')
-    return htmlToImage({
-        html: regularTemplate,
-        content: {
-            playerLevel,
-            bgImage,
-            playerNick,
-            playerStateName,
-            gameName,
-            totalPlaytime,
-            twoWeeksPlaytime,
-            playerStateColor,
-            playingStateTitle,
-            playerAvatar,
-            levelColor
-        },
-        puppeteerArgs: {
-            timeout: 10000
-        }
-    })
+    try {
+        const image = htmlToImage({
+            html: regularTemplate,
+            content: {
+                playerLevel,
+                bgImage,
+                playerNick,
+                playerStateName,
+                gameName,
+                totalPlaytime,
+                twoWeeksPlaytime,
+                playerStateColor,
+                playingStateTitle,
+                playerAvatar,
+                levelColor
+            },
+            puppeteerArgs: {
+                timeout: 10000,
+            }
+        })
+
+        imageCache.set(steamid, image)
+        return image
+    } catch(e) {
+        throw e
+    }
 }

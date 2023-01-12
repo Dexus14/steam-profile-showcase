@@ -25,7 +25,8 @@ app.get('/api/templates/regular', async (req, res) => {
         const image = await generateRegularTemplate(steamid)
         console.log('sending image')
         res.contentType('image/png')
-            .setHeader("Content-Disposition", "inline; filename=signature.png")
+            // Removed for production testing purposes
+            // .setHeader("Content-Disposition", "inline; filename=signature.png")
             .send(image)
     } catch(e) {
         console.error(e)
