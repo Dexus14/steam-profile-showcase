@@ -21,8 +21,24 @@ const imageCache = new NodeCache({
 export async function generateRegularTemplate(steamid: string) {
     if(imageCache.has(steamid)) {
         console.log('cache hit!')
+
+        const hit = imageCache.get(steamid)
+
+        if(hit === 'loading') {
+            console.log('cache delay')
+            await new Promise(r => setTimeout(r, 5000))
+        }
+
+        const newHit = imageCache.get(steamid)
+        if(newHit === 'loading') {
+            throw new Error('Cache is loading')
+        }
+
         return imageCache.get(steamid)
     }
+
+    imageCache.set(steamid, 'loading')
+
     const [playerSummary, recentlyPlayedGames] = await Promise.all([
         getPlayerSummary(steamid),
         getRecentlyPlayed(steamid)
