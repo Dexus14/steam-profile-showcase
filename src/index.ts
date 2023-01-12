@@ -1,6 +1,6 @@
 import express from 'express'
 import bodyParser from "body-parser";
-import {getPlayerSummary} from "./services/steamApiService";
+import {generateRegularTemplate} from "./services/renderService";
 require('dotenv').config()
 
 const app = express()
@@ -13,18 +13,23 @@ app.get('/', (req, res) => {
     res.send('Hello World')
 })
 
-app.get('/test', async (req, res) => {
+app.get('/api/templates/regular', async (req, res) => {
     const steamid = req.query.steamid
     if (!steamid || typeof steamid !== "string") {
         return res.send('No steamid provided').status(500)
     }
 
-    const response = await getPlayerSummary(steamid)
-
-    res.send(response.data)
+    try {
+        const image = await generateRegularTemplate(steamid)
+        res.contentType('image/png')
+            .setHeader("Content-Disposition", "inline; filename=signature.png")
+            .send(image)
+    } catch(e) {
+        console.error(e)
+        res.send('Error occurred').status(500)
+    }
 })
 
-app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use((req, res) => {

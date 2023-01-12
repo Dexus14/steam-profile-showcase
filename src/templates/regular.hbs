@@ -1,0 +1,160 @@
+<html>
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">        <style>
+    body {
+        font-family: 'Lato', sans-serif;
+        color: white;
+
+        height: 200px;
+        width: 500px;
+
+        display: flex;
+        margin: 0;
+        padding: 0;
+    }
+
+    .wrapper {
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        background-color: #111;
+        height: calc(100% - 10px);
+        width: calc(100% - 30px);
+        padding: 5px 15px;
+        z-index: 3;
+    }
+
+    /* LEFT SECTION (avatar + nickname)*/
+    .avatar {
+        max-width: 80%;
+        border: 3px solid {{ playerStateColor }};
+    }
+    .avatar-wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: start;
+        width: 30%;
+    }
+    .avatar-details {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .avatar-details-name {
+        font-weight: 700;
+        margin: 0;
+        max-width: 100%;
+    }
+    .avatar-details-state {
+        color: {{ playerStateColor }};
+        margin: 0;
+    }
+
+
+    /* RIGHT SECTION (game + state)*/
+    .info-wrapper {
+        width: 70%;
+        margin-left: 20px;
+        z-index: 3;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+    }
+
+    /* This is game image background */
+    .now-playing-bg {
+        position: absolute;
+        width: 100%;
+        content: "";
+        top: 0; left: 0;
+        height: 100%;
+        background-image: url({{ bgImage }});
+        background-repeat: no-repeat;
+        background-size: cover;
+        z-index: -999;
+        box-shadow: inset 0px 0px 25px 24px rgba(17, 17, 17, 1);
+        filter: opacity(0.3);
+    }
+
+    .now-playing-bg::after {
+        content: "";
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background-image: linear-gradient(154deg, rgba(89, 131, 252, 0) 0%, rgba(17, 17, 17, 1) 80%);
+    }
+
+    /* Current game/recently played game */
+    .now-playing {
+        display: flex;
+        flex-direction: column;
+        align-items: end;
+    }
+    .playing-time, .playing-title {
+        margin: 0;
+    }
+    .playing-time {
+        font-size: 0.8em;
+        filter: opacity(0.7);
+    }
+
+    /* Tiltle for recently played and level */
+    .section-title {
+        margin: 0 0 10px 0;
+    }
+
+    /* Level */
+    .level-wrapper {
+        border-radius: 50%;
+        padding: 10px;
+        border: 3px solid {{ levelColor }};
+        height: 25px;
+        width: 25px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .level-text {
+        font-size: 1.3rem;
+        margin: 0;
+    }
+
+</style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="now-playing-bg"></div>
+
+    <div class="avatar-wrapper">
+        <div class="avatar-details">
+            <p class="avatar-details-name">{{ playerNick }}</p>
+            <p class="avatar-details-state">{{ playerStateName }}</p>
+        </div>
+        <img class="avatar" src="{{ playerAvatar }}">
+    </div>
+
+    <div class="info-wrapper">
+        <div class="now-playing">
+            <h3 class="section-title">Level</h3>
+            <div class="level-wrapper">
+                <p class="level">{{ playerLevel }}</p>
+            </div>
+        </div>
+        <div class="now-playing">
+            <h3 class="section-title">{{ playingStateTitle }}</h3>
+            <p class="playing-title">
+                {{ gameName }}
+            </p>
+            <p class="playing-time">
+                Total playtime: {{ totalPlaytime }} hours
+            </p>
+            <p class="playing-time">
+                Last 14 days: {{ twoWeeksPlaytime }} hours
+            </p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
