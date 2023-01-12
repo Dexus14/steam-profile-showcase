@@ -4,7 +4,8 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "node dist/index.js",
-    "build": "tsc"
+    "build": "tsc",
+    "postbuild": "cp package.json dist/package.json && cd dist && cp node_modules dist/node_modules"
   },
   "author": "Dexus14",
   "license": "MIT",
