@@ -5,7 +5,7 @@ import puppeteer from "puppeteer";
 
 const regularTemplate = fs.readFileSync(path.join(__dirname, '../../src/templates/regular.hbs')).toString()
 const pup = puppeteer.launch({
-    args: ['--no-sandbox'],
+    args: ['--no-sandbox',  '--disable-setuid-sandbox'],
 })
 
 export function getStateColor(player: any) {
