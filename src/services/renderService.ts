@@ -4,14 +4,10 @@ import {
     getGameInfoAndPlayingState,
     getLevelColor,
     getStateColor,
-    getStateString
+    getStateString,
+    renderDefaultImage
 } from "./renderUtilsService";
-import htmlToImage from "node-html-to-image";
-import * as fs from "fs";
-import * as path from "path";
 import NodeCache from "node-cache";
-
-const regularTemplate = fs.readFileSync(path.join(__dirname, '../../src/templates/regular.hbs')).toString()
 
 const imageCache = new NodeCache({
     stdTTL: 60,
@@ -53,30 +49,25 @@ export async function generateRegularTemplate(steamid: string) {
     console.log(`data received in ${dataend - datastart} ms`)
     console.log('rendering image')
     try {
-        const start = Date.now()
+        const renderstart = Date.now()
 
-        const image = htmlToImage({
-            html: regularTemplate,
-            content: {
-                playerLevel,
-                bgImage,
-                playerNick,
-                playerStateName,
-                gameName,
-                totalPlaytime,
-                twoWeeksPlaytime,
-                playerStateColor,
-                playingStateTitle,
-                playerAvatar,
-                levelColor
-            },
-            puppeteerArgs: {
-                timeout: 10000,
-                args: ['--no-sandbox']
-            }
+        const image = await renderDefaultImage({
+            playerLevel,
+            bgImage,
+            playerNick,
+            playerStateName,
+            gameName,
+            totalPlaytime,
+            twoWeeksPlaytime,
+            playerStateColor,
+            playingStateTitle,
+            playerAvatar,
+            levelColor
         })
 
-        console.log('rendered image in', Date.now() - start, 'ms')
+        const renderend = Date.now()
+        console.log(`rendered in ${renderend - renderstart} ms`)
+
         imageCache.set(steamid, image)
         return image
     } catch(e) {

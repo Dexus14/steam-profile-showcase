@@ -1,3 +1,13 @@
+import handlebars from "handlebars";
+import fs from "fs";
+import path from "path";
+import puppeteer from "puppeteer";
+
+const regularTemplate = fs.readFileSync(path.join(__dirname, '../../src/templates/regular.hbs')).toString()
+const pup = puppeteer.launch({
+    args: ['--no-sandbox'],
+})
+
 export function getStateColor(player: any) {
     if(player.gameextrainfo) {
         return '#5DFC59'
@@ -82,4 +92,20 @@ export function getLevelColor(level: number) {
     }
 
     throw new Error('An error occurred while getting level color')
+}
+
+export async function renderDefaultImage(data: any) { // TODO: Add type
+    const compiled = handlebars.compile(regularTemplate)
+    const html = compiled(data)
+    const browser = await pup
+    const page = await browser.newPage()
+    await page.setContent(html)
+    const div = await page.$('div.wrapper')
+    if(!div) {
+        throw new Error('div not found')
+    }
+    const image = await div.screenshot({type: 'png'})
+    await page.close()
+
+    return image
 }
