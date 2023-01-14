@@ -44,6 +44,7 @@ export function getStateString(player: PlayerSummary) {
 
 export function getBackgroundLink(gameid?: string | number) {
     if (!gameid) {
+        // TODO: Add color based of user state
         return 'https://singlecolorimage.com/get/4e8ddb/460x215';
     }
     return `https://cdn.cloudflare.steamstatic.com/steam/apps/${gameid}/header.jpg`;
