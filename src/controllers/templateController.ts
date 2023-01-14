@@ -12,7 +12,7 @@ export async function getRegularTemplate(req: express.Request, res: express.Resp
     try {
         const image = await generateRegularTemplate(steamid);
         console.log('sending image: ', Date.now() - start);
-        res.contentType('image/png').send(image);
+        res.contentType('image/png').setHeader('Cache-Control', 'max-age=300').send(image);
 
         console.log('finish: ', Date.now() - start);
     } catch (e) {
