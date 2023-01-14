@@ -10,17 +10,22 @@ const pup = puppeteer.launch({
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
 });
 
+export const OFFLINE_COLOR = '#808080';
+export const ONLINE_COLOR = 'deepskyblue';
+export const PLAYING_COLOR = '#5DFC59';
+export const AWAY_COLOR = 'orange';
+
 export function getStateColor(player: PlayerSummary) {
     if (player.gameextrainfo) {
-        return '#5DFC59';
+        return PLAYING_COLOR;
     }
     switch (player.personastate) {
         case 0:
-            return '#808080';
+            return OFFLINE_COLOR;
         case 1:
-            return 'deepskyblue';
+            return ONLINE_COLOR;
         case 3:
-            return 'orange';
+            return AWAY_COLOR;
         default:
             throw new Error('Unknown state');
     }

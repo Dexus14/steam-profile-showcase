@@ -1,4 +1,12 @@
-import { getGameInfoAndPlayingState, getLevelColor, getRegularTemaplateData, getStateColor, getStateString } from '../renderUtilsService';
+import {
+    getGameInfoAndPlayingState,
+    getLevelColor,
+    getRegularTemaplateData,
+    getStateColor,
+    getStateString,
+    ONLINE_COLOR,
+    PLAYING_COLOR,
+} from '../renderUtilsService';
 import {
     PLAYER_ACTIVE_SUMMARY_MOCK,
     PLAYER_LEVEL_MOCK,
@@ -50,25 +58,23 @@ describe('renderUtilsService', () => {
     });
 
     test('getLevelColor - throw on incorrect level', () => {
-        const INCORRECT_LEVEL = 125;
-
-        const color = getLevelColor(INCORRECT_LEVEL);
+        const color = getLevelColor(PLAYER_LEVEL_MOCK);
 
         expect(typeof color).toBe('string');
     });
 
     test('getStateColor - return string', () => {
-        const CORRECT_STATE = 2;
+        const CORRECT_STATE = 1;
 
         const color = getLevelColor(CORRECT_STATE);
 
-        expect(typeof color).toBe('string');
+        expect(color).toBe(ONLINE_COLOR);
     });
 
     test('getStateColor - return game color', () => {
         const color = getStateColor(PLAYER_PLAYING_SUMMARY_MOCK);
 
-        expect(color).toBe('#5DFC59');
+        expect(color).toBe(PLAYING_COLOR);
     });
 
     test('getStateString - return game string', () => {
