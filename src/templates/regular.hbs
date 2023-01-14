@@ -27,7 +27,7 @@
     /* LEFT SECTION (avatar + nickname)*/
     .avatar {
         max-width: 80%;
-        border: 3px solid {{ playerStateColor }};
+        border: 3px solid {{ stateColor }};
     }
     .avatar-wrapper {
         display: flex;
@@ -47,7 +47,7 @@
         max-width: 100%;
     }
     .avatar-details-state {
-        color: {{ playerStateColor }};
+        color: {{ stateColor }};
         margin: 0;
     }
 
@@ -70,7 +70,7 @@
         content: "";
         top: 0; left: 0;
         height: 100%;
-        background-image: url({{ bgImage }});
+        background-image: url({{ backgroundLink }});
         background-repeat: no-repeat;
         background-size: cover;
         z-index: -999;
@@ -129,17 +129,17 @@
 
     <div class="avatar-wrapper">
         <div class="avatar-details">
-            <p class="avatar-details-name">{{ playerNick }}</p>
-            <p class="avatar-details-state">{{ playerStateName }}</p>
+            <p class="avatar-details-name">{{ name }}</p>
+            <p class="avatar-details-state">{{ stateName }}</p>
         </div>
-        <img class="avatar" src="{{ playerAvatar }}">
+        <img class="avatar" src="{{ avatar }}">
     </div>
 
     <div class="info-wrapper">
         <div class="now-playing">
             <h3 class="section-title">Level</h3>
             <div class="level-wrapper">
-                <p class="level">{{ playerLevel }}</p>
+                <p class="level">{{ level }}</p>
             </div>
         </div>
         <div class="now-playing">

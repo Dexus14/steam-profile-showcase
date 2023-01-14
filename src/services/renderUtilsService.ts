@@ -2,27 +2,36 @@ import handlebars from 'handlebars';
 import fs from 'fs';
 import path from 'path';
 import puppeteer from 'puppeteer';
+import { RegularTemplateData } from '../interfaces/renderInterfaces';
+import { PlayerSummary, RecentlyPlayedGame } from '../interfaces/steamInterfaces';
 
 const regularTemplate = fs.readFileSync(path.join(__dirname, '../../src/templates/regular.hbs')).toString();
 const pup = puppeteer.launch({
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
 });
 
-export function getStateColor(player: any) {
+export const OFFLINE_COLOR = '#808080';
+export const ONLINE_COLOR = 'deepskyblue';
+export const PLAYING_COLOR = '#5DFC59';
+export const AWAY_COLOR = 'orange';
+
+export function getStateColor(player: PlayerSummary) {
     if (player.gameextrainfo) {
-        return '#5DFC59';
+        return PLAYING_COLOR;
     }
     switch (player.personastate) {
         case 0:
-            return '#808080';
+            return OFFLINE_COLOR;
         case 1:
-            return 'deepskyblue';
+            return ONLINE_COLOR;
         case 3:
-            return 'orange';
+            return AWAY_COLOR;
+        default:
+            throw new Error('Unknown state');
     }
 }
 
-export function getStateString(player: any) {
+export function getStateString(player: PlayerSummary) {
     if (player.gameextrainfo) {
         return 'In a game';
     }
@@ -33,27 +42,33 @@ export function getStateString(player: any) {
             return 'Online';
         case 3:
             return 'Away';
+        default:
+            throw new Error('Unknown state');
     }
 }
 
-export function getBackgroundLink(gameid?: string) {
+export function getBackgroundLink(gameid?: string | number) {
     if (!gameid) {
+        // TODO: Add color based of user state
         return 'https://singlecolorimage.com/get/4e8ddb/460x215';
     }
     return `https://cdn.cloudflare.steamstatic.com/steam/apps/${gameid}/header.jpg`;
 }
 
-export function getGameInfoAndPlayingState(recentlyPlayedGames: any[], player: any): [any, string] {
+export function getGameInfoAndPlayingState(
+    recentlyPlayedGames: RecentlyPlayedGame[],
+    playerSummary: PlayerSummary,
+): [RecentlyPlayedGame | null, string] {
     // If player is playing a game
     if (!recentlyPlayedGames?.length) {
-        // FIXME: Find a better way to handle this
-        return [{}, "Didn't play anything recently"];
+        return [null, "Didn't play anything recently"];
     }
 
-    let game = player.gameid ? recentlyPlayedGames.find((el: any) => el.appid === parseInt(player.gameid)) : recentlyPlayedGames[0];
+    const gameid = playerSummary.gameid;
+    let game = gameid !== undefined ? recentlyPlayedGames.find((el: RecentlyPlayedGame) => el.appid === parseInt(gameid)) : recentlyPlayedGames[0];
 
     let playingStateTitle = 'Recently played';
-    if (player.gameid && game) {
+    if (gameid && game) {
         playingStateTitle = 'Currently playing';
     }
 
@@ -92,8 +107,39 @@ export function getLevelColor(level: number) {
     throw new Error('An error occurred while getting level color');
 }
 
-export async function renderDefaultImage(data: any) {
-    // TODO: Add type
+export function getRegularTemaplateData(recentlyPlayedGames: RecentlyPlayedGame[], playerSummary: PlayerSummary, playerLevel: number) {
+    const [gameInfo, playingStateTitle] = getGameInfoAndPlayingState(recentlyPlayedGames, playerSummary);
+
+    let totalPlaytime: number | string = 'n/a';
+    let twoWeeksPlaytime: number | string = 'n/a';
+    let gameName = 'Nothing';
+    let backgroundLink = getBackgroundLink();
+
+    if (gameInfo !== null) {
+        totalPlaytime = Math.round(gameInfo.playtime_forever / 60);
+        twoWeeksPlaytime = Math.round(gameInfo.playtime_2weeks / 60);
+        gameName = gameInfo.name;
+        backgroundLink = getBackgroundLink(gameInfo.appid);
+    }
+
+    const data: RegularTemplateData = {
+        avatar: playerSummary.avatarfull,
+        name: playerSummary.personaname,
+        level: playerLevel,
+        levelColor: getLevelColor(playerLevel),
+        stateColor: getStateColor(playerSummary),
+        stateName: getStateString(playerSummary),
+        backgroundLink,
+        gameName,
+        playingStateTitle,
+        totalPlaytime,
+        twoWeeksPlaytime,
+    };
+
+    return data;
+}
+
+export async function renderDefaultImage(data: RegularTemplateData) {
     const compiled = handlebars.compile(regularTemplate);
     const html = compiled(data);
     const browser = await pup;
