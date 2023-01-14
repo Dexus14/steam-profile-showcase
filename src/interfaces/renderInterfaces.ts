@@ -8,6 +8,6 @@ export interface RegularTemplateData {
     backgroundLink: string;
     gameName: string;
     playingStateTitle: string;
-    totalPlaytime: number;
-    twoWeeksPlaytime: number;
+    totalPlaytime: number | string;
+    twoWeeksPlaytime: number | string;
 }

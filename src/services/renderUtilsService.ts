@@ -42,7 +42,7 @@ export function getStateString(player: PlayerSummary) {
     }
 }
 
-export function getBackgroundLink(gameid?: string) {
+export function getBackgroundLink(gameid?: string | number) {
     if (!gameid) {
         return 'https://singlecolorimage.com/get/4e8ddb/460x215';
     }
@@ -52,10 +52,10 @@ export function getBackgroundLink(gameid?: string) {
 export function getGameInfoAndPlayingState(
     recentlyPlayedGames: RecentlyPlayedGame[],
     playerSummary: PlayerSummary,
-): [RecentlyPlayedGame | object, string] {
+): [RecentlyPlayedGame | null, string] {
     // If player is playing a game
     if (!recentlyPlayedGames?.length) {
-        return [{}, "Didn't play anything recently"];
+        return [null, "Didn't play anything recently"];
     }
 
     const gameid = playerSummary.gameid;
@@ -103,8 +103,18 @@ export function getLevelColor(level: number) {
 
 export function getRegularTemaplateData(recentlyPlayedGames: RecentlyPlayedGame[], playerSummary: PlayerSummary, playerLevel: number) {
     const [gameInfo, playingStateTitle] = getGameInfoAndPlayingState(recentlyPlayedGames, playerSummary);
-    const totalPlaytime = Math.round(gameInfo.playtime_forever / 60);
-    const twoWeeksPlaytime = Math.round(gameInfo.playtime_2weeks / 60);
+
+    let totalPlaytime: number | string = 'n/a';
+    let twoWeeksPlaytime: number | string = 'n/a';
+    let gameName = 'Nothing';
+    let backgroundLink = getBackgroundLink();
+
+    if (gameInfo !== null) {
+        totalPlaytime = Math.round(gameInfo.playtime_forever / 60);
+        twoWeeksPlaytime = Math.round(gameInfo.playtime_2weeks / 60);
+        gameName = gameInfo.name;
+        backgroundLink = getBackgroundLink(gameInfo.appid);
+    }
 
     const data: RegularTemplateData = {
         avatar: playerSummary.avatarfull,
@@ -113,8 +123,8 @@ export function getRegularTemaplateData(recentlyPlayedGames: RecentlyPlayedGame[
         levelColor: getLevelColor(playerLevel),
         stateColor: getStateColor(playerSummary),
         stateName: getStateString(playerSummary),
-        backgroundLink: getBackgroundLink(gameInfo.appid),
-        gameName: gameInfo.name ?? 'Nothing',
+        backgroundLink,
+        gameName,
         playingStateTitle,
         totalPlaytime,
         twoWeeksPlaytime,
