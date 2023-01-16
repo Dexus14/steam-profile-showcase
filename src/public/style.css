@@ -13,3 +13,8 @@ html, body {
     justify-content: center;
     align-items: center;
 }
+
+img {
+    width: 500px;
+    max-width: 100%;
+}
