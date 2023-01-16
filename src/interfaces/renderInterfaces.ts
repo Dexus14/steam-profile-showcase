@@ -11,3 +11,7 @@ export interface RegularTemplateData {
     totalPlaytime: number | string;
     twoWeeksPlaytime: number | string;
 }
+
+export interface RegularTemplateOptions {
+    gameBackground: boolean;
+}

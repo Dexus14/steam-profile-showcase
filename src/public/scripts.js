@@ -2,6 +2,10 @@ const resultBox = document.getElementById('resultBox');
 const steamIdInput = document.getElementById('steamId');
 const exampleImage = document.getElementById('exampleImage');
 
+const gameBackgroundSwitch = document.getElementById('gameBackgroundSwitch');
+
+gameBackgroundSwitch.addEventListener('change', updateResultBox);
+
 const resultTypeLinkButton = document.getElementById('resultTypeLink');
 const resultTypeHtmlButton = document.getElementById('resultTypeHtml');
 const resultTypeMarkdownButton = document.getElementById('resultTypeMarkdown');
@@ -46,7 +50,13 @@ function getLink() {
         return null;
     }
 
-    return window.origin + '/api/templates/regular?steamid=' + steamId;
+    let link = window.origin + '/api/templates/regular?steamid=' + steamId;
+
+    if (gameBackgroundSwitch.checked) {
+        link += '&gameBackground=1';
+    }
+
+    return link;
 }
 
 function changeResultType(type) {
@@ -72,10 +82,11 @@ function changeResultType(type) {
 }
 
 function updateResultBox() {
+    exampleImage.src = './preview.png';
+
     const resultLink = getLink();
 
     if (resultLink === null) {
-        exampleImage.src = './preview.png';
         resultBox.innerText = 'Invalid SteamID';
         return;
     }
