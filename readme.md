@@ -8,6 +8,10 @@ Use the following link: ```https://steam-profile-showcase.herokuapp.com/api/temp
 
 Replace ```{STEAMID}``` with your SteamID64.
 
+or
+
+Use [GUI generator](https://steam-profile-showcase.herokuapp.com)
+
 ## Running
 1. Clone the repository
 2. Fill in the .env file following the .env.example file
