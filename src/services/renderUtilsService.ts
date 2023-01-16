@@ -2,8 +2,9 @@ import handlebars from 'handlebars';
 import fs from 'fs';
 import path from 'path';
 import puppeteer from 'puppeteer';
-import { RegularTemplateData } from '../interfaces/renderInterfaces';
+import { RegularTemplateData, RegularTemplateOptions } from '../interfaces/renderInterfaces';
 import { PlayerSummary, RecentlyPlayedGame } from '../interfaces/steamInterfaces';
+import express from 'express';
 
 const regularTemplate = fs.readFileSync(path.join(__dirname, '../../src/templates/regular.hbs')).toString();
 const pup = puppeteer.launch({
@@ -11,9 +12,9 @@ const pup = puppeteer.launch({
 });
 
 export const OFFLINE_COLOR = '#808080';
-export const ONLINE_COLOR = 'deepskyblue';
+export const ONLINE_COLOR = '#00BFFF';
 export const PLAYING_COLOR = '#5DFC59';
-export const AWAY_COLOR = 'orange';
+export const AWAY_COLOR = '#FFA500';
 
 export function getStateColor(player: PlayerSummary) {
     if (player.gameextrainfo) {
@@ -47,10 +48,11 @@ export function getStateString(player: PlayerSummary) {
     }
 }
 
-export function getBackgroundLink(gameid?: string | number) {
-    if (!gameid) {
+export function getBackgroundLink(gameid: string | number | null = null, color = '4e8ddb') {
+    if (gameid === null) {
         // TODO: Add color based of user state
-        return 'https://singlecolorimage.com/get/4e8ddb/460x215';
+        color = color?.split('#')[1];
+        return `https://singlecolorimage.com/get/${color}/460x215`;
     }
     return `https://cdn.cloudflare.steamstatic.com/steam/apps/${gameid}/header.jpg`;
 }
@@ -107,19 +109,24 @@ export function getLevelColor(level: number) {
     throw new Error('An error occurred while getting level color');
 }
 
-export function getRegularTemaplateData(recentlyPlayedGames: RecentlyPlayedGame[], playerSummary: PlayerSummary, playerLevel: number) {
+export function getRegularTemaplateData(
+    recentlyPlayedGames: RecentlyPlayedGame[],
+    playerSummary: PlayerSummary,
+    playerLevel: number,
+    options: RegularTemplateOptions,
+) {
     const [gameInfo, playingStateTitle] = getGameInfoAndPlayingState(recentlyPlayedGames, playerSummary);
 
     let totalPlaytime: number | string = 'n/a';
     let twoWeeksPlaytime: number | string = 'n/a';
     let gameName = 'Nothing';
-    let backgroundLink = getBackgroundLink();
+    const stateColor = getStateColor(playerSummary);
+    const backgroundLink = options.gameBackground ? getBackgroundLink(gameInfo?.appid) : getBackgroundLink(null, stateColor);
 
     if (gameInfo !== null) {
         totalPlaytime = Math.round(gameInfo.playtime_forever / 60);
         twoWeeksPlaytime = Math.round(gameInfo.playtime_2weeks / 60);
         gameName = gameInfo.name;
-        backgroundLink = getBackgroundLink(gameInfo.appid);
     }
 
     const data: RegularTemplateData = {
@@ -127,7 +134,7 @@ export function getRegularTemaplateData(recentlyPlayedGames: RecentlyPlayedGame[
         name: playerSummary.personaname,
         level: playerLevel,
         levelColor: getLevelColor(playerLevel),
-        stateColor: getStateColor(playerSummary),
+        stateColor,
         stateName: getStateString(playerSummary),
         backgroundLink,
         gameName,
@@ -153,4 +160,16 @@ export async function renderDefaultImage(data: RegularTemplateData) {
     await page.close();
 
     return image;
+}
+
+export function getRegularTemaplateOptions(req: express.Request) {
+    const options: RegularTemplateOptions = {
+        gameBackground: req.query.gameBackground === '1',
+    };
+
+    return options;
+}
+
+export function generateCacheKey(steamid: string, templateType: 'regular', options: RegularTemplateOptions) {
+    return `${steamid}-${templateType}-${options.gameBackground}`;
 }

@@ -19,17 +19,16 @@ import { RecentlyPlayedGame } from '../../interfaces/steamInterfaces';
 describe('renderUtilsService', () => {
     test('getRegularTemaplateData - csgo player', () => {
         const recentlyPlayedGames = [RECENTLY_PLAYED_GAME_CSGO_MOCK, RECENTLY_PLAYED_GAME_DOTA2_MOCK];
-        const result = getRegularTemaplateData(recentlyPlayedGames, PLAYER_ACTIVE_SUMMARY_MOCK, PLAYER_LEVEL_MOCK);
+        const result = getRegularTemaplateData(recentlyPlayedGames, PLAYER_ACTIVE_SUMMARY_MOCK, PLAYER_LEVEL_MOCK, { gameBackground: false });
 
         expect(result).toEqual({
             avatar: PLAYER_ACTIVE_SUMMARY_MOCK.avatarfull,
             name: PLAYER_ACTIVE_SUMMARY_MOCK.personaname,
             level: PLAYER_LEVEL_MOCK,
             levelColor: '#4e8ddb',
-            stateColor: 'deepskyblue',
+            stateColor: ONLINE_COLOR,
             stateName: 'Online',
-            // Background link should return the first game in the list
-            backgroundLink: `https://cdn.cloudflare.steamstatic.com/steam/apps/${recentlyPlayedGames[0].appid}/header.jpg`,
+            backgroundLink: `https://singlecolorimage.com/get/00BFFF/460x215`,
             gameName: recentlyPlayedGames[0].name,
             playingStateTitle: 'Recently played',
             totalPlaytime: Math.round(recentlyPlayedGames[0].playtime_forever / 60),
@@ -39,17 +38,16 @@ describe('renderUtilsService', () => {
 
     test('getRegularTemaplateData - not playing', () => {
         const recentlyPlayedGames: RecentlyPlayedGame[] = [];
-        const result = getRegularTemaplateData(recentlyPlayedGames, PLAYER_ACTIVE_SUMMARY_MOCK, PLAYER_LEVEL_MOCK);
+        const result = getRegularTemaplateData(recentlyPlayedGames, PLAYER_ACTIVE_SUMMARY_MOCK, PLAYER_LEVEL_MOCK, { gameBackground: false });
 
         expect(result).toEqual({
             avatar: PLAYER_ACTIVE_SUMMARY_MOCK.avatarfull,
             name: PLAYER_ACTIVE_SUMMARY_MOCK.personaname,
             level: PLAYER_LEVEL_MOCK,
             levelColor: '#4e8ddb',
-            stateColor: 'deepskyblue',
+            stateColor: ONLINE_COLOR,
             stateName: 'Online',
-            // Background link should return the first game in the list
-            backgroundLink: `https://singlecolorimage.com/get/4e8ddb/460x215`,
+            backgroundLink: `https://singlecolorimage.com/get/00BFFF/460x215`,
             gameName: 'Nothing',
             playingStateTitle: "Didn't play anything recently",
             totalPlaytime: 'n/a',
@@ -64,9 +62,7 @@ describe('renderUtilsService', () => {
     });
 
     test('getStateColor - return string', () => {
-        const CORRECT_STATE = 1;
-
-        const color = getLevelColor(CORRECT_STATE);
+        const color = getStateColor(PLAYER_ACTIVE_SUMMARY_MOCK);
 
         expect(color).toBe(ONLINE_COLOR);
     });
